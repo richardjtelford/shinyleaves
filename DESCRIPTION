@@ -18,3 +18,5 @@ Imports:
     shiny
 Remotes:
     bioc::release/EBImage
+URL: https://github.com/richardjtelford/shinyleaves
+BugReports: https://github.com/richardjtelford/shinyleaves/issues
