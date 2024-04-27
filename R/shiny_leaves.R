@@ -124,7 +124,11 @@ shiny_leaves <- function() {
 
     # crop image
     cropped_image <- reactive({
-      img()[input$left:(nrow(img()) - input$right), input$top:(ncol(img()) - input$bottom), ]
+      left <- ifelse(is.na(input$left), 0, input$left)
+      right <- ifelse(is.na(input$right), 0, input$right)
+      top <- ifelse(is.na(input$top), 0, input$top)
+      bottom <- ifelse(is.na(input$bottom), 0, input$bottom)
+      img()[left:(nrow(img()) - right), top:(ncol(img()) - bottom), ]
     })
 
     # render cropped image
@@ -187,7 +191,7 @@ shiny_leaves <- function() {
 
     # segmented image
     segmented <- reactive({
-      bwlabel(threshold_img())
+      bwlabel(!threshold_img())
     })
 
     # features
