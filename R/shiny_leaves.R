@@ -211,5 +211,3 @@ shiny_leaves <- function() {
   shinyApp(ui, server)
 }
 
-# object analysis (with sliders)
-# better default image
