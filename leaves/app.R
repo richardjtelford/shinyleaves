@@ -1,8 +1,19 @@
-library(shiny)
-library(bslib)
-library(EBImage)
-library(autothresholdr)
-library(purrr)
+#' Shiny leaves
+#' @description
+#' An app to explain how leaf area is calculated from a scan.
+#' It can also be used to work interactively with problematic leaves to better
+#' understand how to process them.
+#' @import shiny
+#' @import bslib
+#' @import EBImange
+#' @import autothresholder
+#' @importFrom purrr map_int
+#' @examples
+#' # Run app
+#' shiny_leaves()
+#'
+#' @export
+#'
 
 shiny_leaves <- function() {
   ui <- page_fillable(
