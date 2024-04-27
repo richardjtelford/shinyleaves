@@ -8,10 +8,13 @@
 #' @import EBImage
 #' @import autothresholdr
 #' @importFrom purrr map_int
+#' @importFrom graphics rug text
+#' @importFrom grDevices rainbow
 #' @examples
 #' # Run app
-#' shiny_leaves()
-#'
+#' if (interactive()) {
+#'  shiny_leaves()
+#' }
 #' @export
 #'
 

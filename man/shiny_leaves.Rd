@@ -13,6 +13,7 @@ understand how to process them.
 }
 \examples{
 # Run app
-shiny_leaves()
-
+if (interactive()) {
+ shiny_leaves()
+}
 }
