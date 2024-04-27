@@ -115,7 +115,7 @@ shiny_leaves <- function() {
     # load image
     img <- reactive({
       if (is.null(input$file)) {
-        f <- system.file("images", "sample-color.png", package = "EBImage")
+        f <-  system.file("extdata/AAZ7235.jpeg", package = "shinyleaves")
         x <- readImage(f)
       } else {
         EBImage::readImage(input$file$datapath)
