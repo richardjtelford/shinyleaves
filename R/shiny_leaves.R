@@ -5,8 +5,8 @@
 #' understand how to process them.
 #' @import shiny
 #' @import bslib
-#' @import EBImange
-#' @import autothresholder
+#' @import EBImage
+#' @import autothresholdr
 #' @importFrom purrr map_int
 #' @examples
 #' # Run app
