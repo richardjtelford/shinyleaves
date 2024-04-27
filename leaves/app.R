@@ -15,9 +15,8 @@ ui <- page_fillable(
           accordion(
             accordion_panel(
               title = "Instructions",
-                p("Select a leaf image file and trim off the edges to remove black lines, rulers, etc.")
+              p("Select a leaf image file and trim off the edges to remove black lines, rulers, etc.")
             ),
-
             fileInput("file", label = "Select a file", multiple = FALSE, accept = "image/"),
             accordion_panel(
               title = "Trim off the edges",
@@ -42,25 +41,24 @@ ui <- page_fillable(
             accordion_panel(
               title = "Instructions",
               p("The next step is to convert the image to grey-scale, and make a histogram of the intensities of each pixel. High intensities indicate the scan background. Low intensities indicate the leaf. Intermediate values might be smears on the scanner, dirt, or a pale part of the leaf."),
-              p("We need to choose the intensity that best separates the leaf from the background. This could be done manually, but doing this for each of hundreds of leaves would be too much work (and not very reproducible), so we can also use an autothresholder algorithm."),
-              p("For more information about the autothreshold algorithms, see the", a("imagej documentation", href = "https://imagej.net/plugins/auto-threshold", target="_blank"), ".")
+              p("We need to choose the intensity that best separates the leaf from the background. This could be done manually, but doing this for each of hundreds of leaves would be too much work (and not very reproducible), so we can also use an autothreshold algorithm."),
+              p("For more information about the autothreshold algorithms, see the", a("imagej documentation", href = "https://imagej.net/plugins/auto-threshold", target = "_blank"), ".")
             ),
-          sliderInput("manual", "Manual threshold", min = 0, max = 1, value = 0.5),
-          accordion_panel(title = "Select autothreshold",
-
-          checkboxGroupInput("autothresh",
-            label = "Auto threshold algorithm",
-            choices = c(
-              "IJDefault", "Huang", "Huang2", "Intermodes", "IsoData",
-              "Li", "Mean", "MinErrorI", "Minimum", "Moments", "Otsu",
-              "Percentile", "RenyiEntropy", "Shanbhag", "Triangle"
+            sliderInput("manual", "Manual threshold", min = 0, max = 1, value = 0.5),
+            accordion_panel(
+              title = "Select autothreshold",
+              checkboxGroupInput("autothresh",
+                label = "Auto threshold algorithm",
+                choices = c(
+                  "IJDefault", "Huang", "Huang2", "Intermodes", "IsoData",
+                  "Li", "Mean", "MinErrorI", "Minimum", "Moments", "Otsu",
+                  "Percentile", "RenyiEntropy", "Shanbhag", "Triangle"
+                ),
+                selected = c("Minimum", "Otsu")
+              )
             ),
-            selected = c("Minimum", "Otsu")
+            radioButtons("selected_thresh", label = "Select one algorithm to use", choices = "Manual", selected = "Manual")
           )
-          ),
-          radioButtons("selected_thresh", label = "Select one algorithm to use", choices = "Manual", selected = "Manual")
-          )
-
         ),
         layout_columns(
           col_widths = c(4, 4, 4, 12),
@@ -74,7 +72,6 @@ ui <- page_fillable(
           ),
           card(tableOutput("threshold_tbl")),
           card(plotOutput("threshold_img")),
-
         )
       )
     ),
@@ -85,6 +82,14 @@ ui <- page_fillable(
           open = TRUE,
           sliderInput("threshold", "Threshold", min = 0, max = 1, value = 0.5)
         ),
+        layout_columns(
+          col_widths = c(4, 4),
+          card(
+            plotOutput("segmented"),
+            fill = TRUE
+          ),
+          card(tableOutput("features"))
+        )
       )
     )
   )
@@ -153,15 +158,36 @@ server <- function(input, output) {
     updateRadioButtons(inputId = "selected_thresh", choices = c("Manual", input$autothresh))
   })
 
+  threshold_img <- reactive({
+    thresh <- switch(input$selected_thresh,
+      Manual = input$manual,
+      thresholds()$threshold[thresholds()$method == input$selected_thresh]
+    )
+    img <- grey_scale() >= thresh
+  })
+
   # thresholded image
   output$threshold_img <- renderPlot({
-      thresh <- switch(input$selected_thresh,
-        Manual = input$manual,
-        thresholds()$threshold[thresholds()$method == input$selected_thresh]
-      )
-      img <- grey_scale() >= thresh
-      display(img, method = "raster")
+    display(threshold_img(), method = "raster")
   })
+
+  # segmented image
+  segmented <- reactive({
+    bwlabel(threshold_img())
+  })
+
+  # features
+  features <- reactive({
+    computeFeatures.shape(segmented())
+  })
+
+  output$segmented <- renderPlot({
+    cols <- c("black", sample(rainbow(max(segmented()))))
+    zrainbow <- Image(cols[1 + segmented()], dim = dim(segmented()))
+    display(zrainbow, title = "Leaves (recolored)", method = "raster")
+  })
+
+  output$features <- renderTable(features())
 }
 
 shinyApp(ui, server)
