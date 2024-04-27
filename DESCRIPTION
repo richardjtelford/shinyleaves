@@ -1,10 +1,12 @@
 Package: shinyleaves
-Title: What the Package Does (One Line, Title Case)
+Title: A shiny app to explain processing of leaf scans
 Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Authors@R: c(
+  person("Richard J.", "Telford", email = "richard.telford@uib.no", role = c("aut", "cre"), 
+        comment = c(ORCID = "https://orcid.org/0000-0001-9826-3076"))
+  )
+Maintainer: Richard J. Telford <richard.telford@uib.no>
+Description: A shiny app to explain processing of leaf scans. Designed for teaching or to examine leaves that fail to process normally.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
