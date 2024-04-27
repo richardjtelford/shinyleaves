@@ -31,7 +31,11 @@ shiny_leaves <- function() {
                 title = "Instructions",
                 p("Select a leaf image file and trim off the edges to remove black lines, rulers, etc.")
               ),
-              fileInput("file", label = "Select a file", multiple = FALSE, accept = "image/"),
+              accordion_panel(
+                title = "Choose an image or your own file",
+                uiOutput("file_list"),
+                fileInput("file", label = "Select a file", multiple = FALSE, accept = "image/")
+              ),
               accordion_panel(
                 title = "Trim off the edges",
                 numericInput("left", "left", value = 0, min = 0),
@@ -112,10 +116,16 @@ shiny_leaves <- function() {
 
 
   server <- function(input, output) {
+    # list built-in images
+    output$file_list <- renderUI({
+      files <- list.files(system.file("extdata/", package = "shinyleaves"))
+      radioButtons("chosen_image", "Choose an image", choices = files, selected = sample(files, 1))
+    })
+
     # load image
     img <- reactive({
       if (is.null(input$file)) {
-        f <-  system.file("extdata/AAZ7235.jpeg", package = "shinyleaves")
+        f <-  system.file("extdata/", input$chosen_image, package = "shinyleaves")
         x <- readImage(f)
       } else {
         EBImage::readImage(input$file$datapath)
