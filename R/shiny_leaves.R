@@ -34,7 +34,7 @@ shiny_leaves <- function() {
                 p("Select a leaf image file and trim off the edges to remove black lines, rulers, etc.")
               ),
               accordion_panel(
-                title = "Choose an image or your own file",
+                title = "Choose an leaf from Svalbard or your own file",
                 uiOutput("file_list"),
                 fileInput("file", label = "Select a file", multiple = FALSE, accept = "image/")
               ),
@@ -103,6 +103,15 @@ shiny_leaves <- function() {
         layout_sidebar(
           sidebar = sidebar(
             open = TRUE,
+            accordion(
+              accordion_panel(
+                title = "Instructions",
+                p("Now we can identify different objects as groups of connected pixels."),
+                p("To convert the area in pixels to mm^2, we need to know the resolution of the scan, by convention given in dots per inch (dpi)."),
+                p("To remove dust, smears etc, we can set the minimum area required to be treated as a leaf."),
+                p("Now we have the area of each leaf. Various shape attributes can also be calculated (e.g. circularity).")
+              )
+            ),
             numericInput("dpi", "Resolution dpi", min = 0, value = 300),
             numericInput("min_area", "Minimum area mm", min = 0, value = 0)
           ),
