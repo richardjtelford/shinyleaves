@@ -16,7 +16,8 @@ Imports:
     bslib,
     EBImage,
     purrr,
-    shiny
+    shiny,
+    tibble
 Remotes:
     bioc::release/EBImage
 URL: https://github.com/richardjtelford/shinyleaves

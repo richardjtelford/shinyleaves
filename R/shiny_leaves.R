@@ -10,6 +10,7 @@
 #' @importFrom purrr map_int
 #' @importFrom graphics rug text
 #' @importFrom grDevices rainbow
+#' @importFrom tibble tibble
 #' @examples
 #' # Run app
 #' if (interactive()) {
@@ -76,7 +77,7 @@ shiny_leaves <- function() {
                 )
               ),
               radioButtons("selected_thresh", label = "Select one algorithm to use", choices = "Manual", selected = "Manual"),
-              sliderInput("zoom", "Zoom histogram y-axis", min = 0, y = Inf)
+              numericInput("zoom", "Zoom histogram y-axis", min = 0, max = Inf, value = 0)
             )
 
 
@@ -101,7 +102,8 @@ shiny_leaves <- function() {
         layout_sidebar(
           sidebar = sidebar(
             open = TRUE,
-            numericInput("ymax", "ymax", min = 0)
+            numericInput("dpi", "Resolution dpi", min = 0, value = 300),
+            numericInput("min_area", "Minimum area mm", min = 0, value = 0)
           ),
           layout_columns(
             col_widths = c(8, 4),
@@ -120,9 +122,12 @@ shiny_leaves <- function() {
 
   server <- function(input, output) {
     # list built-in images
+    svalbard_leaves <- list.files(system.file("extdata/", package = "shinyleaves"))
+    random_leaf <- sample(svalbard_leaves, size = 1)
+
+    # built-in leaf ui
     output$file_list <- renderUI({
-      files <- list.files(system.file("extdata/", package = "shinyleaves"))
-      radioButtons("chosen_image", "Choose an image", choices = files, selected = sample(files, 1))
+      radioButtons("chosen_image", "Choose an image", choices = svalbard_leaves, selected = random_leaf)
     })
 
     # load image
@@ -133,7 +138,8 @@ shiny_leaves <- function() {
         f <-  system.file("extdata/", input$chosen_image, package = "shinyleaves")
         readImage(f)
       } else {
-        Image(rnorm(300*300*3),dim=c(300,300,3), colormode='Color')
+        f <-  system.file("extdata/", random_leaf, package = "shinyleaves")
+        readImage(f)
       }
     })
 
@@ -170,10 +176,10 @@ shiny_leaves <- function() {
 
     # histogram of intensities
     output$histogram <- renderPlot({
-      if(is.na(input$ymax)) {
+      if(is.na(input$zoom) || input$zoom == 0) {
         hist(grey_scale())
       } else {
-        hist(grey_scale(), ylim = c(0, input$ymax))
+        hist(grey_scale(), ylim = c(0, input$zoom))
       }
 
       rug(thresholds()$threshold)
@@ -222,10 +228,16 @@ shiny_leaves <- function() {
     output$segmented <- renderDisplay({
       cols <- c("black", sample(rainbow(max(segmented()))))
       zrainbow <- Image(cols[1 + segmented()], dim = dim(segmented()))
-      display(zrainbow, title = "Leaves (recolored)", method = "raster")
+      display(zrainbow, title = "Leaves (recolored)")
     })
 
-    output$features <- renderTable(features())
+    output$features <- renderTable({
+      px <- features()[, "s.area"]
+      tibble(
+        `Area (pixels)` = px,
+        `Area (mm^2)` = (px / input$dpi ^ 2) * 25.4^2
+      )
+      })
   }
 
   shinyApp(ui, server)
