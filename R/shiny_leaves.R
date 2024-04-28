@@ -11,6 +11,7 @@
 #' @importFrom graphics rug text
 #' @importFrom grDevices rainbow
 #' @importFrom tibble tibble
+#' @importFrom dplyr filter
 #' @examples
 #' # Run app
 #' if (interactive()) {
@@ -222,21 +223,24 @@ shiny_leaves <- function() {
 
     # features
     features <- reactive({
-      computeFeatures.shape(segmented())
+      px <- computeFeatures.shape(segmented())[, "s.area"]
+      tibble(
+        n = seq_along(px),
+        `Area (pixels)` = px,
+        `Area (mm^2)` = (px / input$dpi ^ 2) * 25.4^2
+      )
     })
 
     output$segmented <- renderDisplay({
       cols <- c("black", sample(rainbow(max(segmented()))))
+      cols[which(features()$`Area (mm^2)` < input$min_area) + 1] <- "white"
       zrainbow <- Image(cols[1 + segmented()], dim = dim(segmented()))
       display(zrainbow, title = "Leaves (recolored)")
     })
 
     output$features <- renderTable({
-      px <- features()[, "s.area"]
-      tibble(
-        `Area (pixels)` = px,
-        `Area (mm^2)` = (px / input$dpi ^ 2) * 25.4^2
-      )
+      features() |>
+        filter(`Area (mm^2)` > input$min_area)
       })
   }
 
