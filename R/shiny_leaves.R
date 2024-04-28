@@ -75,8 +75,11 @@ shiny_leaves <- function() {
                   selected = c("Minimum", "Otsu")
                 )
               ),
-              radioButtons("selected_thresh", label = "Select one algorithm to use", choices = "Manual", selected = "Manual")
+              radioButtons("selected_thresh", label = "Select one algorithm to use", choices = "Manual", selected = "Manual"),
+              sliderInput("zoom", "Zoom histogram y-axis", min = 0, y = Inf)
             )
+
+
           ),
           layout_columns(
             col_widths = c(4, 4, 4, 12),
@@ -98,12 +101,12 @@ shiny_leaves <- function() {
         layout_sidebar(
           sidebar = sidebar(
             open = TRUE,
-            sliderInput("threshold", "Threshold", min = 0, max = 1, value = 0.5)
+            numericInput("ymax", "ymax", min = 0)
           ),
           layout_columns(
-            col_widths = c(4, 4),
+            col_widths = c(8, 4),
             card(
-              plotOutput("segmented"),
+              displayOutput("segmented"),
               fill = TRUE
             ),
             card(tableOutput("features"))
@@ -124,11 +127,13 @@ shiny_leaves <- function() {
 
     # load image
     img <- reactive({
-      if (is.null(input$file)) {
+      if (!is.null(input$file)) {
+        readImage(input$file$datapath)
+      } else if (!is.null(input$chosen_image)) {
         f <-  system.file("extdata/", input$chosen_image, package = "shinyleaves")
-        x <- readImage(f)
+        readImage(f)
       } else {
-        EBImage::readImage(input$file$datapath)
+        Image(rnorm(300*300*3),dim=c(300,300,3), colormode='Color')
       }
     })
 
@@ -165,7 +170,12 @@ shiny_leaves <- function() {
 
     # histogram of intensities
     output$histogram <- renderPlot({
-      hist(grey_scale())
+      if(is.na(input$ymax)) {
+        hist(grey_scale())
+      } else {
+        hist(grey_scale(), ylim = c(0, input$ymax))
+      }
+
       rug(thresholds()$threshold)
       text(
         thresholds()$threshold,
@@ -209,7 +219,7 @@ shiny_leaves <- function() {
       computeFeatures.shape(segmented())
     })
 
-    output$segmented <- renderPlot({
+    output$segmented <- renderDisplay({
       cols <- c("black", sample(rainbow(max(segmented()))))
       zrainbow <- Image(cols[1 + segmented()], dim = dim(segmented()))
       display(zrainbow, title = "Leaves (recolored)", method = "raster")
