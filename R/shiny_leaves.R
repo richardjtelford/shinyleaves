@@ -15,7 +15,7 @@
 #' @examples
 #' # Run app
 #' if (interactive()) {
-#'  shiny_leaves()
+#'   shiny_leaves()
 #' }
 #' @export
 #'
@@ -23,6 +23,20 @@
 shiny_leaves <- function() {
   ui <- page_fillable(
     navset_pill(
+      footer = p(
+        "shinyleaves app is a",
+        a("PTFC", href = "https://plantfunctionaltraitscourses.w.uib.no/", target = "_blank"),
+        "and",
+        a("DURIN", href = "https://betweenthefjords.w.uib.no/durin/", target = "_blank"),
+        "project written by",
+        a("Richard J Telford", href = "https://richardjtelford.github.io/", target = "_blank")
+      ),
+      nav_panel(
+        title = "Introduction",
+        h1("Calculating leaf area"),
+        p("Leaf area is a key plant trait."),
+        p("")
+      ),
       nav_panel(
         title = "Import and trim",
         layout_sidebar(
@@ -34,7 +48,7 @@ shiny_leaves <- function() {
                 p("Select a leaf image file and trim off the edges to remove black lines, rulers, etc.")
               ),
               accordion_panel(
-                title = "Choose an leaf from Svalbard or your own file",
+                title = "Choose a leaf from Svalbard or your own file",
                 uiOutput("file_list"),
                 fileInput("file", label = "Select a file", multiple = FALSE, accept = "image/")
               ),
@@ -43,7 +57,8 @@ shiny_leaves <- function() {
                 numericInput("left", "left", value = 0, min = 0),
                 numericInput("right", "right", value = 0, min = 0),
                 numericInput("top", "top", value = 0, min = 0),
-                numericInput("bottom", "bottom", value = 0, min = 0)
+                numericInput("bottom", "bottom", value = 0, min = 0),
+                checkboxInput("default_trim", "Use PFTC defaults")
               )
             )
           ),
@@ -80,8 +95,6 @@ shiny_leaves <- function() {
               radioButtons("selected_thresh", label = "Select one algorithm to use", choices = "Manual", selected = "Manual"),
               numericInput("zoom", "Zoom histogram y-axis", min = 0, max = Inf, value = 0)
             )
-
-
           ),
           layout_columns(
             col_widths = c(4, 4, 4, 12),
@@ -145,11 +158,21 @@ shiny_leaves <- function() {
       if (!is.null(input$file)) {
         readImage(input$file$datapath)
       } else if (!is.null(input$chosen_image)) {
-        f <-  system.file("extdata/", input$chosen_image, package = "shinyleaves")
+        f <- system.file("extdata/", input$chosen_image, package = "shinyleaves")
         readImage(f)
       } else {
-        f <-  system.file("extdata/", random_leaf, package = "shinyleaves")
+        f <- system.file("extdata/", random_leaf, package = "shinyleaves")
         readImage(f)
+      }
+    })
+
+    # set default trim
+    observe({
+      if (input$default_trim) {
+        updateNumericInput(inputId = "left", value = 100)
+        updateNumericInput(inputId = "right", value = 200)
+        updateNumericInput(inputId = "top", value = 100)
+        updateNumericInput(inputId = "bottom", value = 100)
       }
     })
 
@@ -186,7 +209,7 @@ shiny_leaves <- function() {
 
     # histogram of intensities
     output$histogram <- renderPlot({
-      if(is.na(input$zoom) || input$zoom == 0) {
+      if (is.na(input$zoom) || input$zoom == 0) {
         hist(grey_scale())
       } else {
         hist(grey_scale(), ylim = c(0, input$zoom))
@@ -236,7 +259,7 @@ shiny_leaves <- function() {
       tibble(
         n = seq_along(px),
         `Area (pixels)` = px,
-        `Area (mm^2)` = (px / input$dpi ^ 2) * 25.4^2
+        `Area (mm^2)` = (px / input$dpi^2) * 25.4^2
       )
     })
 
@@ -250,9 +273,8 @@ shiny_leaves <- function() {
     output$features <- renderTable({
       features() |>
         filter(`Area (mm^2)` > input$min_area)
-      })
+    })
   }
 
   shinyApp(ui, server)
 }
-
