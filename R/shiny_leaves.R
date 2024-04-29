@@ -24,18 +24,23 @@ shiny_leaves <- function() {
   ui <- page_fillable(
     navset_pill(
       footer = p(
-        "shinyleaves app is a",
+        "shinyleaves app is a contribution to",
         a("PTFC", href = "https://plantfunctionaltraitscourses.w.uib.no/", target = "_blank"),
         "and",
         a("DURIN", href = "https://betweenthefjords.w.uib.no/durin/", target = "_blank"),
-        "project written by",
+        ". It is written by",
         a("Richard J Telford", href = "https://richardjtelford.github.io/", target = "_blank")
       ),
       nav_panel(
         title = "Introduction",
-        h1("Calculating leaf area"),
-        p("Leaf area is a key plant trait."),
-        p("")
+        layout_sidebar(
+          open = FALSE,
+          h1("Calculating leaf area"),
+          p("Leaf area is a key functional plant trait, both in its own right and as a component of specific leaf area (SLA - the ratio of leaf area to leaf dry mass"),
+          p("Leaves are scanned on a flatbed scanner, and then the area of the leaves calculated with image processing software."),
+          p("shinyleaves is a shiny app that explains the steps involved in processing leaves."),
+          p("It can be used for teaching, or to experiment with difficult leaves.")
+        )
       ),
       nav_panel(
         title = "Import and trim",
@@ -136,6 +141,13 @@ shiny_leaves <- function() {
             ),
             card(tableOutput("features"))
           )
+        )
+      ),
+      nav_panel(
+        title = "Software",
+        layout_sidebar(
+          open = FALSE,
+          p("")
         )
       )
     )
