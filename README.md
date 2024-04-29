@@ -26,3 +26,10 @@ shiny_leaves()
 ```
 
 You can either use the leaves within in the package or supply your own.
+
+## Shinyapps
+
+If you want to quickly try `shinyleaves`, it is available on [shinyapps.io](
+https://richardjtelford.shinyapps.io/shinyleaves/).
+If you use it a lot, please install it locally or my shinyapps allowance will be all used up. 
+
