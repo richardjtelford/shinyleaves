@@ -211,7 +211,7 @@ shiny_leaves <- function() {
 
     # render cropped image
     output$display <- renderDisplay({
-      display(cropped_image())
+      display(cropped_image(), method = "browser")
     })
 
     # convert image to greyscale
@@ -291,7 +291,7 @@ shiny_leaves <- function() {
       cols <- c("black", sample(rainbow(max(segmented()))))
       cols[which(features()$`Area (mm^2)` < input$min_area) + 1] <- "white"
       zrainbow <- Image(cols[1 + segmented()], dim = dim(segmented()))
-      display(zrainbow, title = "Leaves (recolored)")
+      display(zrainbow, title = "Leaves (recolored)", method = "browser")
     })
 
     output$features <- renderTable({
