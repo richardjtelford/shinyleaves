@@ -34,7 +34,8 @@ shiny_leaves <- function() {
       nav_panel(
         title = "Introduction",
         layout_sidebar(
-          open = FALSE,
+          sidebar = p("Please send bug reports and suggestions for improvements to", a(icon("github"), href = "https://github.com/richardjtelford/shinyleaves/issues", target = "_blank")),
+          open = "closed",
           h1("Calculating leaf area"),
           p("Leaf area is a key functional plant trait, both in its own right and as a component of specific leaf area (SLA - the ratio of leaf area to leaf dry mass"),
           p("Leaves are scanned on a flatbed scanner, and then the area of the leaves calculated with image processing software."),
@@ -146,10 +147,21 @@ shiny_leaves <- function() {
       nav_panel(
         title = "Software",
         layout_sidebar(
-          open = FALSE,
-          p("")
+          open = "closed",
+          h1("R packages for processing leaf images"),
+          h3("leafArea"),
+          p("The leafArea package calculates leaf area from images using ImageJ to do the calculations. It is on CRAN, but PTFC has its own version that increases flexibility with, for example, cropping."),
+          h3("pliman"),
+          p("The pliman package calculates leaf area and some plant disease related metrics. It is available from CRAN."),
+          h3("EBImage"),
+          p("The EBImage package is a general image processing package designed for biological data. Is available from bioconductor.
+            This app uses EBImage for its calculations"),
+          h3("autothresholdr"),
+          p("The autothresoldr package calculates the full range of autothresholds implimented in ImageJ.")
         )
-      )
+      ),
+      nav_spacer(),
+      nav_item(a(icon("github"), href = "https://github.com/richardjtelford/shinyleaves", target = "_blank"))
     )
   )
 
