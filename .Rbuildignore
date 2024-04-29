@@ -1,3 +1,4 @@
 ^LICENSE\.md$
 ^shinyleaves\.Rproj$
 ^\.Rproj\.user$
+^app\.R$
