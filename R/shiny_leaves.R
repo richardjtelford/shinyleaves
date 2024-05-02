@@ -80,8 +80,18 @@ shiny_leaves <- function() {
             open = TRUE,
             accordion(
               accordion_panel(
-                title = "Instructions",
-                p("The next step is to convert the image to grey-scale, and make a histogram of the intensities of each pixel. High intensities indicate the scan background. Low intensities indicate the leaf. Intermediate values might be smears on the scanner, dirt, or a pale part of the leaf."),
+                title = "Make a monochrome image",
+                p("The next step is to convert the full-colour image to a monochrome image. This can be done by converting the image to grey, or by using just the blue channel. The blue channel can be used as leaves absorb blue light, so this should maximise the contrast between the leaf and the background"),
+                radioButtons("channel", "Channel", choices = c("blue", "grey"), selected = "grey")
+              ),
+              accordion_panel(
+                title = "Intensity histogram",
+                p("Now we make a histogram of the intensities of each pixel. High intensities indicate the scan background. Low intensities indicate the leaf. Intermediate values might be smears on the scanner, dirt, or a pale part of the leaf."),
+              p("Because, at least with small leaves, most of the scan is background, it can be helpful to truncate the y-axis of the histogram"),
+              numericInput("zoom", "Truncate histogram y-axis to", min = 0, max = Inf, value = 0)
+              ),
+              accordion_panel(
+                title = "Thresholding the histogram",
                 p("We need to choose the intensity that best separates the leaf from the background. This could be done manually, but doing this for each of hundreds of leaves would be too much work (and not very reproducible), so we can also use an autothreshold algorithm."),
                 p("For more information about the autothreshold algorithms, see the", a("imagej documentation", href = "https://imagej.net/plugins/auto-threshold", target = "_blank"), ".")
               ),
@@ -99,7 +109,7 @@ shiny_leaves <- function() {
                 )
               ),
               radioButtons("selected_thresh", label = "Select one algorithm to use", choices = "Manual", selected = "Manual"),
-              numericInput("zoom", "Zoom histogram y-axis", min = 0, max = Inf, value = 0)
+
             )
           ),
           layout_columns(
@@ -216,7 +226,12 @@ shiny_leaves <- function() {
 
     # convert image to greyscale
     grey_scale <- reactive({
-      channel(cropped_image(), mode = "grey")
+      if (input$channel == "blue") {
+        channel(cropped_image(), mode = "blue")
+      } else {
+        channel(cropped_image(), mode = "grey")
+      }
+
     })
 
     output$grey_scale <- renderPlot(display(grey_scale(), method = "raster"))
