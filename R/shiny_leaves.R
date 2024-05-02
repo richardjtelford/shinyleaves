@@ -50,16 +50,14 @@ shiny_leaves <- function() {
             open = "open",
             accordion(
               accordion_panel(
-                title = "Instructions",
-                p("Select a leaf image file and trim off the edges to remove black lines, rulers, etc.")
-              ),
-              accordion_panel(
-                title = "Choose a leaf from Svalbard or your own file",
+                title = "Select a leaf",
+                p("Select a leaf image file either from the selection from Svalbard or your own image"),
                 uiOutput("file_list"),
                 fileInput("file", label = "Select a file", multiple = FALSE, accept = "image/")
               ),
               accordion_panel(
                 title = "Trim off the edges",
+                p("Trim off the edges of the image to remove black lines, rulers, etc., otherwise these will be counted as leaves by the algorithm."),
                 numericInput("left", "left", value = 0, min = 0),
                 numericInput("right", "right", value = 0, min = 0),
                 numericInput("top", "top", value = 0, min = 0),
