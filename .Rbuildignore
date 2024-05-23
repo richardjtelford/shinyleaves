@@ -2,3 +2,4 @@
 ^shinyleaves\.Rproj$
 ^\.Rproj\.user$
 ^app\.R$
+^rsconnect/
