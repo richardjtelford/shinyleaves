@@ -14,6 +14,6 @@ understand how to process them.
 \examples{
 # Run app
 if (interactive()) {
- shiny_leaves()
+  shiny_leaves()
 }
 }

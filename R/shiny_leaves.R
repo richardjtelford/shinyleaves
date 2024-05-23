@@ -12,6 +12,7 @@
 #' @importFrom grDevices rainbow
 #' @importFrom tibble tibble
 #' @importFrom dplyr filter
+#' @importFrom rlang .data
 #' @examples
 #' # Run app
 #' if (interactive()) {
@@ -309,7 +310,7 @@ shiny_leaves <- function() {
 
     output$features <- renderTable({
       features() |>
-        filter(`Area (mm^2)` > input$min_area)
+        filter(.data$`Area (mm^2)` > input$min_area)
     })
   }
 
